@@ -17,7 +17,6 @@ class ProviderList {
     (ref) => BoardListProvider(ref),
   );
 
-  static final draggableNotifier =
-      StateNotifierProvider<DraggableNotfier, DraggableProviderState>(
-          (ref) => DraggableNotfier(ref));
+  static final draggableNotifier = StateNotifierProvider<DraggableNotfier, DraggableProviderState>(
+      (ref) => DraggableNotfier(ref));
 }

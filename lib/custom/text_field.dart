@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../Provider/provider_list.dart';
+import 'package:kanban_board/provider/provider_list.dart';
 
 class TField extends ConsumerStatefulWidget {
   const TField({super.key});

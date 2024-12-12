@@ -11,14 +11,10 @@ class DraggableProviderState {
   bool get isListDragged => draggableType == DraggableType.list;
 
   DraggableProviderState(
-      {this.cardDraggable,
-      this.draggableType = DraggableType.none,
-      this.listDraggable});
+      {this.cardDraggable, this.draggableType = DraggableType.none, this.listDraggable});
 
   DraggableProviderState copyWith(
-      {CardDraggable? cardDraggable,
-      ListDraggable? listDraggable,
-      DraggableType? draggableType}) {
+      {CardDraggable? cardDraggable, ListDraggable? listDraggable, DraggableType? draggableType}) {
     return DraggableProviderState(
         cardDraggable: cardDraggable ?? this.cardDraggable,
         listDraggable: listDraggable ?? this.listDraggable,

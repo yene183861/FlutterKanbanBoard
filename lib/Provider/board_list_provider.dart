@@ -1,11 +1,9 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanban_board/constants.dart';
 import 'package:kanban_board/draggable/draggable_state.dart';
+import 'package:kanban_board/models/item_state.dart';
 import '../custom/list_item.dart';
-import '../custom/text_field.dart';
-import '../models/item_state.dart';
 import 'provider_list.dart';
 
 class BoardListProvider extends ChangeNotifier {
@@ -17,69 +15,25 @@ class BoardListProvider extends ChangeNotifier {
   var newList = false;
 
   void calculateSizePosition(
-      {required int listIndex,
-      required BuildContext context,
-      required VoidCallback setstate}) {
+      {required int listIndex, required BuildContext context, required VoidCallback setstate}) {
     var prov = ref.read(ProviderList.boardProvider);
     prov.board.lists[listIndex].context = context;
     var box = context.findRenderObject() as RenderBox;
     var location = box.localToGlobal(Offset.zero);
-    prov.board.lists[listIndex].x =
-        location.dx - prov.board.displacementX! - 10;
+    prov.board.lists[listIndex].x = location.dx - prov.board.displacementX! - 10;
     prov.board.lists[listIndex].setState = setstate;
-    prov.board.lists[listIndex].y =
-        location.dy - prov.board.displacementY! + 24;
+    prov.board.lists[listIndex].y = location.dy - prov.board.displacementY! + 24;
     prov.board.lists[listIndex].width ??= box.size.width;
     prov.board.lists[listIndex].height ??= box.size.height;
   }
 
-  Future addNewCard({required String position, required int listIndex}) async {
-    var prov = ref.read(ProviderList.boardProvider);
-    final cardState = prov.newCardState;
-    if (cardState.isFocused == true) {
-      ref.read(ProviderList.cardProvider).saveNewCard();
-    }
-
-    var scroll = prov.board.lists[listIndex].scrollController;
-
-    // log("MAX EXTENT =${scroll.position.maxScrollExtent}");
-
-    prov.board.lists[listIndex].items.insert(
-        position == "TOP" ? 0 : prov.board.lists[listIndex].items.length,
-        ListItem(
-          child: Container(
-              width: prov.board.lists[listIndex].width,
-              color: Colors.white,
-              margin: const EdgeInsets.only(bottom: 10),
-              child: const TField()),
-          listIndex: listIndex,
-          isNew: true,
-          index: prov.board.lists[listIndex].items.length,
-          prevChild: Container(
-              width: prov.board.lists[listIndex].width,
-              color: Colors.white,
-              margin: const EdgeInsets.only(bottom: 10),
-              padding: const EdgeInsets.all(10),
-              child: const TField()),
-        ));
-    position == "TOP" ? await scrollToMin(scroll) : scrollToMax(scroll);
-    cardState.listIndex = listIndex;
-    cardState.isFocused = true;
-    cardState.cardIndex =
-        position == "TOP" ? 0 : prov.board.lists[listIndex].items.length - 1;
-    prov.board.lists[listIndex].setState!();
-  }
-
   void onListLongpress(
-      {required int listIndex,
-      required BuildContext context,
-      required VoidCallback setstate}) {
+      {required int listIndex, required BuildContext context, required VoidCallback setstate}) {
     var prov = ref.read(ProviderList.boardProvider);
     final draggableProv = ref.read(ProviderList.draggableNotifier.notifier);
     for (var element in prov.board.lists) {
       if (element.context == null) break;
-      var of = (element.context!.findRenderObject() as RenderBox)
-          .localToGlobal(Offset.zero);
+      var of = (element.context!.findRenderObject() as RenderBox).localToGlobal(Offset.zero);
       element.x = of.dx;
       element.width = element.context!.size!.width - LIST_GAP;
       element.height = element.context!.size!.height;
@@ -88,8 +42,7 @@ class BoardListProvider extends ChangeNotifier {
     var box = context.findRenderObject() as RenderBox;
     var location = box.localToGlobal(Offset.zero);
     prov.updateValue(
-        dx: location.dx - prov.board.displacementX!,
-        dy: location.dy - prov.board.displacementY!);
+        dx: location.dx - prov.board.displacementX!, dy: location.dy - prov.board.displacementY!);
 
     prov.board.dragItemIndex = null;
     prov.board.dragItemOfListIndex = listIndex;
@@ -106,9 +59,7 @@ class BoardListProvider extends ChangeNotifier {
                   child: Text(
                     prov.board.lists[listIndex].title,
                     style: const TextStyle(
-                        fontSize: 20,
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold),
+                        fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
                   ),
                 ),
             Expanded(
@@ -122,8 +73,7 @@ class BoardListProvider extends ChangeNotifier {
                   shrinkWrap: true,
                   itemBuilder: (ctx, index) {
                     return Item(
-                      color: prov.board.lists[listIndex].items[index]
-                              .backgroundColor ??
+                      color: prov.board.lists[listIndex].items[index].backgroundColor ??
                           Colors.grey.shade200,
                       itemIndex: index,
                       listIndex: listIndex,
@@ -158,11 +108,8 @@ class BoardListProvider extends ChangeNotifier {
     await controller.animateTo(
       controller.position.pixels + controller.position.extentAfter,
       duration: Duration(
-          milliseconds: (int.parse(controller.position.extentAfter
-              .toString()
-              .substring(0, 3)
-              .split('.')
-              .first))),
+          milliseconds: (int.parse(
+              controller.position.extentAfter.toString().substring(0, 3).split('.').first))),
       curve: Curves.linear,
     );
     scrollToMax(controller);
@@ -173,15 +120,11 @@ class BoardListProvider extends ChangeNotifier {
       return;
     }
 
-    log(controller.position.extentBefore.toString());
     await controller.animateTo(
       controller.position.pixels - controller.position.extentBefore,
       duration: Duration(
-          milliseconds: (int.parse(controller.position.extentBefore
-              .toString()
-              .substring(0, 3)
-              .split('.')
-              .first))),
+          milliseconds: (int.parse(
+              controller.position.extentBefore.toString().substring(0, 3).split('.').first))),
       curve: Curves.linear,
     );
     scrollToMin(controller);
@@ -193,19 +136,16 @@ class BoardListProvider extends ChangeNotifier {
     if (!draggableProv.isCardDragged || scrolling) {
       return;
     }
-    var controller =
-        prov.board.lists[prov.board.dragItemOfListIndex!].scrollController;
+    var controller = prov.board.lists[prov.board.dragItemOfListIndex!].scrollController;
     if (controller.offset < controller.position.maxScrollExtent &&
-        prov.valueNotifier.value.dy >
-            controller.position.viewportDimension - 50) {
+        prov.valueNotifier.value.dy > controller.position.viewportDimension - 50) {
       scrolling = true;
       scrollingDown = true;
       if (prov.board.listScrollConfig == null) {
         await controller.animateTo(controller.offset + 45,
             duration: const Duration(milliseconds: 250), curve: Curves.linear);
       } else {
-        await controller.animateTo(
-            prov.board.listScrollConfig!.offset + controller.offset,
+        await controller.animateTo(prov.board.listScrollConfig!.offset + controller.offset,
             duration: prov.board.listScrollConfig!.duration,
             curve: prov.board.listScrollConfig!.curve);
       }
@@ -220,8 +160,7 @@ class BoardListProvider extends ChangeNotifier {
         await controller.animateTo(controller.offset - 45,
             duration: const Duration(milliseconds: 250), curve: Curves.linear);
       } else {
-        await controller.animateTo(
-            controller.offset - prov.board.listScrollConfig!.offset,
+        await controller.animateTo(controller.offset - prov.board.listScrollConfig!.offset,
             duration: prov.board.listScrollConfig!.duration,
             curve: prov.board.listScrollConfig!.curve);
       }
@@ -243,7 +182,6 @@ class BoardListProvider extends ChangeNotifier {
         prov.board.lists[prov.draggedItemState!.listIndex! + 1].x!) {
       return;
     }
-    // dev.log("LIST RIGHT");
     prov.board.lists.insert(prov.draggedItemState!.listIndex! + 1,
         prov.board.lists.removeAt(prov.draggedItemState!.listIndex!));
     prov.draggedItemState!.listIndex = prov.draggedItemState!.listIndex! + 1;
@@ -261,8 +199,7 @@ class BoardListProvider extends ChangeNotifier {
     }
     if (prov.valueNotifier.value.dx >
         prov.board.lists[prov.draggedItemState!.listIndex! - 1].x! +
-            (prov.board.lists[prov.draggedItemState!.listIndex! - 1].width! /
-                2)) {
+            (prov.board.lists[prov.draggedItemState!.listIndex! - 1].width! / 2)) {
       // dev.log(
       // "RETURN LEFT LIST ${prov.valueNotifier.value.dx} ${prov.board.lists[prov.draggedItemState!.listIndex! - 1].x! + (prov.board.lists[prov.draggedItemState!.listIndex! - 1].width! / 2)} ");
       return;

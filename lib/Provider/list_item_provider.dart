@@ -1,10 +1,9 @@
-import 'dart:developer';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanban_board/draggable/draggable_state.dart';
-import '../models/board_list.dart';
-import '../models/item_state.dart';
+import 'package:kanban_board/models/board_list.dart';
+import 'package:kanban_board/models/item_state.dart';
 import 'provider_list.dart';
 
 class ListItemProvider extends ChangeNotifier {
@@ -23,10 +22,8 @@ class ListItemProvider extends ChangeNotifier {
     var box = context.findRenderObject() as RenderBox;
     var location = box.localToGlobal(Offset.zero);
     prov.board.lists[listIndex].items[itemIndex].setState = setsate;
-    prov.board.lists[listIndex].items[itemIndex].x =
-        location.dx - prov.board.displacementX!;
-    prov.board.lists[listIndex].items[itemIndex].y =
-        location.dy - prov.board.displacementY!;
+    prov.board.lists[listIndex].items[itemIndex].x = location.dx - prov.board.displacementX!;
+    prov.board.lists[listIndex].items[itemIndex].y = location.dy - prov.board.displacementY!;
     prov.board.lists[listIndex].items[itemIndex].actualSize ??= box.size;
     prov.board.lists[listIndex].items[itemIndex].width = box.size.width;
     prov.board.lists[listIndex].items[itemIndex].height = box.size.height;
@@ -34,14 +31,12 @@ class ListItemProvider extends ChangeNotifier {
 
   void resetCardWidget() {
     var prov = ref.read(ProviderList.boardProvider);
-    prov.board.lists[prov.board.dragItemOfListIndex!]
-        .items[prov.board.dragItemIndex!].placeHolderAt = PlaceHolderAt.none;
-    prov.board.lists[prov.board.dragItemOfListIndex!]
-        .items[prov.board.dragItemIndex!].placeHolderAt = PlaceHolderAt.none;
-    prov.board.lists[prov.board.dragItemOfListIndex!]
-            .items[prov.board.dragItemIndex!].child =
-        prov.board.lists[prov.board.dragItemOfListIndex!]
-            .items[prov.board.dragItemIndex!].prevChild;
+    prov.board.lists[prov.board.dragItemOfListIndex!].items[prov.board.dragItemIndex!]
+        .placeHolderAt = PlaceHolderAt.none;
+    prov.board.lists[prov.board.dragItemOfListIndex!].items[prov.board.dragItemIndex!]
+        .placeHolderAt = PlaceHolderAt.none;
+    prov.board.lists[prov.board.dragItemOfListIndex!].items[prov.board.dragItemIndex!].child = prov
+        .board.lists[prov.board.dragItemOfListIndex!].items[prov.board.dragItemIndex!].prevChild;
   }
 
   bool calculateSizePosition({
@@ -51,9 +46,7 @@ class ListItemProvider extends ChangeNotifier {
     var prov = ref.read(ProviderList.boardProvider);
     var item = prov.board.lists[listIndex].items[itemIndex];
     var list = prov.board.lists[listIndex];
-    if (item.context == null ||
-        list.context == null ||
-        !item.context!.mounted) {
+    if (item.context == null || list.context == null || !item.context!.mounted) {
       return true;
     }
     var box = item.context!.findRenderObject();
@@ -108,9 +101,8 @@ class ListItemProvider extends ChangeNotifier {
                   child: DottedBorder(
                     child: const Center(
                         child: Text(
-                      "Drop your task here ",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      "Chuyển trạng thái ",
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     )),
                   ),
                 ),
@@ -130,11 +122,7 @@ class ListItemProvider extends ChangeNotifier {
           tween: Tween<double>(begin: item.actualSize!.height, end: 0),
           builder: (context, value, child) {
             return Transform.translate(
-              offset: Offset(
-                  0,
-                  item.placeHolderAt == PlaceHolderAt.bottom
-                      ? value
-                      : (-value)),
+              offset: Offset(0, item.placeHolderAt == PlaceHolderAt.bottom ? value : (-value)),
               child: child,
             );
           },
@@ -159,20 +147,19 @@ class ListItemProvider extends ChangeNotifier {
                   );
                 },
                 child: Container(
-                  // decoration: BoxDecoration(
-                  //   border: Border.all(color: Colors.grey.shade200),
-                  //   borderRadius: BorderRadius.circular(4),
-                  //   color: item.backgroundColor ?? Colors.white,
-                  // ),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.shade200),
+                    borderRadius: BorderRadius.circular(4),
+                    color: item.backgroundColor ?? Colors.white,
+                  ),
                   margin: const EdgeInsets.only(top: 10),
                   width: prov.draggedItemState!.width,
                   height: prov.draggedItemState!.height,
                   child: DottedBorder(
                     child: const Center(
                         child: Text(
-                      "Drop your task here ",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      "Chuyển trạng thái ",
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     )),
                   ),
                 ),
@@ -188,16 +175,14 @@ class ListItemProvider extends ChangeNotifier {
     var isItemHidden = itemIndex - 1 >= 0 &&
         prov.draggedItemState!.itemIndex == itemIndex - 1 &&
         prov.draggedItemState!.listIndex == listIndex;
-    if (prov.board.lists[prov.board.dragItemOfListIndex!]
-            .items[prov.board.dragItemIndex!].addedBySystem ==
+    if (prov.board.lists[prov.board.dragItemOfListIndex!].items[prov.board.dragItemIndex!]
+            .addedBySystem ==
         true) {
       prov.board.lists[prov.board.dragItemOfListIndex!].items.removeAt(0);
-      log("ITEM REMOVED");
 
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         prov.board.lists[prov.board.dragItemOfListIndex!].setState!();
         if (isItemHidden) {
-          //  print("ITEM HIDDEN");
           prov.move = "DOWN";
         }
         prov.board.dragItemIndex = itemIndex;
@@ -216,8 +201,7 @@ class ListItemProvider extends ChangeNotifier {
     var prov = ref.read(ProviderList.boardProvider);
     var item = prov.board.lists[listIndex].items[itemIndex];
 
-    bool willPlaceHolderAtBottom =
-        _bottomPlaceHolderPossibility(listIndex, itemIndex);
+    bool willPlaceHolderAtBottom = _bottomPlaceHolderPossibility(listIndex, itemIndex);
     // willPlaceHolderAtBottom = ((itemIndex ==
     //         prov.board.lists[listIndex].items.length - 1) &&
     //     ((prov.draggedItemState!.height * 0.6) + prov.valueNotifier.value.dy >
@@ -242,8 +226,7 @@ class ListItemProvider extends ChangeNotifier {
     if (getYAxisCondition(listIndex: listIndex, itemIndex: itemIndex)) {
       // log("UP/DOWNN");
       // print("BOTTOM PLACEHOLDER => ${willPlaceHolderAtBottom}");
-      if (willPlaceHolderAtBottom &&
-          item.placeHolderAt == PlaceHolderAt.bottom) {
+      if (willPlaceHolderAtBottom && item.placeHolderAt == PlaceHolderAt.bottom) {
         return;
       }
 
@@ -253,8 +236,7 @@ class ListItemProvider extends ChangeNotifier {
 
       resetCardWidget();
 
-      item.placeHolderAt =
-          willPlaceHolderAtBottom ? PlaceHolderAt.bottom : PlaceHolderAt.top;
+      item.placeHolderAt = willPlaceHolderAtBottom ? PlaceHolderAt.bottom : PlaceHolderAt.top;
 
       if (willPlaceHolderAtBottom) {
         prov.move = "LAST";
@@ -273,22 +255,20 @@ class ListItemProvider extends ChangeNotifier {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         //     log("PREVIOUS |${prov.board.dragItemOfListIndex}| LIST= ${prov.board.dragItemIndex}");
 
-        if (!prov.board.lists[prov.board.dragItemOfListIndex!].items[temp!]
-            .context!.mounted) return;
+        if (!prov.board.lists[prov.board.dragItemOfListIndex!].items[temp!].context!.mounted)
+          return;
 
         if (isItemHidden) {
           prov.move = "DOWN";
         }
-        if (itemIndex != prov.board.dragItemIndex &&
-            prov.board.dragItemOfListIndex != listIndex) {
-          prov.board.lists[prov.board.dragItemOfListIndex!].items[temp]
-              .placeHolderAt = PlaceHolderAt.none;
+        if (itemIndex != prov.board.dragItemIndex && prov.board.dragItemOfListIndex != listIndex) {
+          prov.board.lists[prov.board.dragItemOfListIndex!].items[temp].placeHolderAt =
+              PlaceHolderAt.none;
         }
 
         prov.board.dragItemIndex = itemIndex;
         prov.board.dragItemOfListIndex = listIndex;
-        prov.board.lists[prov.board.dragItemOfListIndex!].items[temp]
-            .setState!();
+        prov.board.lists[prov.board.dragItemOfListIndex!].items[temp].setState!();
         //  log("UP/DOWN $listIndex $itemIndex");
         item.setState!();
       });
@@ -319,12 +299,11 @@ class ListItemProvider extends ChangeNotifier {
         // if (isItemHidden) {
         //   prov.move = "DOWN";
         // }
-        prov.board.lists[prov.board.dragItemOfListIndex!]
-                .items[prov.board.dragItemIndex!].child =
-            prov.board.lists[prov.board.dragItemOfListIndex!]
-                .items[prov.board.dragItemIndex!].prevChild;
-        prov.board.lists[prov.board.dragItemOfListIndex!]
-            .items[prov.board.dragItemIndex!].setState!();
+        prov.board.lists[prov.board.dragItemOfListIndex!].items[prov.board.dragItemIndex!].child =
+            prov.board.lists[prov.board.dragItemOfListIndex!].items[prov.board.dragItemIndex!]
+                .prevChild;
+        prov.board.lists[prov.board.dragItemOfListIndex!].items[prov.board.dragItemIndex!]
+            .setState!();
         prov.board.dragItemIndex = itemIndex;
         prov.board.dragItemOfListIndex = listIndex;
 
@@ -341,10 +320,8 @@ class ListItemProvider extends ChangeNotifier {
     var item = prov.board.lists[listIndex].items[itemIndex];
 
     var willPlaceHolderAtTop = item.placeHolderAt == PlaceHolderAt.bottom
-        ? (prov.valueNotifier.value.dy <
-            item.y! + (item.actualSize!.height * 0.65))
-        : ((prov.valueNotifier.value.dy <=
-                item.y! + (item.actualSize!.height * 0.65)) &&
+        ? (prov.valueNotifier.value.dy < item.y! + (item.actualSize!.height * 0.65))
+        : ((prov.valueNotifier.value.dy <= item.y! + (item.actualSize!.height * 0.65)) &&
             (prov.draggedItemState!.height + prov.valueNotifier.value.dy >
                 item.y! + (item.height!)));
 
@@ -373,9 +350,8 @@ class ListItemProvider extends ChangeNotifier {
                 item.y! + (item.height! * 0.5)) &&
             (prov.valueNotifier.value.dy < item.y!));
 
-    bool x = (item.placeHolderAt == PlaceHolderAt.top
-        ? item.height != item.actualSize!.height
-        : true);
+    bool x =
+        (item.placeHolderAt == PlaceHolderAt.top ? item.height != item.actualSize!.height : true);
 
     return
         // false&&
@@ -398,18 +374,15 @@ class ListItemProvider extends ChangeNotifier {
   bool getXAxisCondition({required int listIndex, required int itemIndex}) {
     var prov = ref.read(ProviderList.boardProvider);
 
-    var right = ((prov.draggedItemState!.width * 0.6) +
-                prov.valueNotifier.value.dx >
+    var right = ((prov.draggedItemState!.width * 0.6) + prov.valueNotifier.value.dx >
             prov.board.lists[listIndex].x!) &&
         ((prov.board.lists[listIndex].x! + prov.board.lists[listIndex].width! >
             prov.draggedItemState!.width + prov.valueNotifier.value.dx)) &&
         (prov.board.dragItemOfListIndex != listIndex);
     var left = (((prov.draggedItemState!.width) + prov.valueNotifier.value.dx >
-            prov.board.lists[listIndex].x! +
-                prov.board.lists[listIndex].width!) &&
+            prov.board.lists[listIndex].x! + prov.board.lists[listIndex].width!) &&
         ((prov.draggedItemState!.width * 0.6) + prov.valueNotifier.value.dx <
-            prov.board.lists[listIndex].x! +
-                prov.board.lists[listIndex].width!) &&
+            prov.board.lists[listIndex].x! + prov.board.lists[listIndex].width!) &&
         (prov.board.dragItemOfListIndex != listIndex));
 
     return (left || right);
@@ -422,8 +395,7 @@ class ListItemProvider extends ChangeNotifier {
     var canReplaceCurrent = ((prov.valueNotifier.value.dy >= item.y!) &&
         (item.height! + item.y! >
             prov.valueNotifier.value.dy + (prov.draggedItemState!.height / 2)));
-    var willPlaceHolderAtBottom = (itemIndex ==
-            prov.board.lists[listIndex].items.length - 1 &&
+    var willPlaceHolderAtBottom = (itemIndex == prov.board.lists[listIndex].items.length - 1 &&
         ((prov.draggedItemState!.height * 0.6) + prov.valueNotifier.value.dy >
             item.y! + item.height!));
 
@@ -433,8 +405,7 @@ class ListItemProvider extends ChangeNotifier {
 
       resetCardWidget();
 
-      item.placeHolderAt =
-          willPlaceHolderAtBottom ? PlaceHolderAt.bottom : PlaceHolderAt.top;
+      item.placeHolderAt = willPlaceHolderAtBottom ? PlaceHolderAt.bottom : PlaceHolderAt.top;
       if (willPlaceHolderAtBottom) {
         prov.move = "LAST";
         // log("BOTTOM PLACEHOLDER X AXIS");
@@ -450,8 +421,8 @@ class ListItemProvider extends ChangeNotifier {
       if (isPrevSystemCard(listIndex: listIndex, itemIndex: itemIndex)) return;
 
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        prov.board.lists[prov.board.dragItemOfListIndex!]
-            .items[prov.board.dragItemIndex!].setState!();
+        prov.board.lists[prov.board.dragItemOfListIndex!].items[prov.board.dragItemIndex!]
+            .setState!();
         if (isItemHidden) {
           prov.move = "DOWN";
         }
@@ -472,22 +443,18 @@ class ListItemProvider extends ChangeNotifier {
     final draggableProv = ref.read(ProviderList.draggableNotifier.notifier);
     var box = context.findRenderObject() as RenderBox;
     var location = box.localToGlobal(Offset.zero);
-    prov.board.lists[listIndex].items[itemIndex].x =
-        location.dx - prov.board.displacementX!;
-    prov.board.lists[listIndex].items[itemIndex].y =
-        location.dy - prov.board.displacementY!;
+    prov.board.lists[listIndex].items[itemIndex].x = location.dx - prov.board.displacementX!;
+    prov.board.lists[listIndex].items[itemIndex].y = location.dy - prov.board.displacementY!;
     // prov.board.lists[listIndex].items[itemIndex].width = box.size.width;
     // prov.board.lists[listIndex].items[itemIndex].height = box.size.height;
     prov.updateValue(
-        dx: location.dx - prov.board.displacementX!,
-        dy: location.dy - prov.board.displacementY!);
+        dx: location.dx - prov.board.displacementX!, dy: location.dy - prov.board.displacementY!);
     prov.board.dragItemIndex = itemIndex;
     prov.board.dragItemOfListIndex = listIndex;
     draggableProv.setDraggableType(DraggableType.card);
     prov.draggedItemState = DraggedItemState(
         child: SizedBox(
-          width:
-              prov.board.lists[listIndex].items[itemIndex].context!.size!.width,
+          width: prov.board.lists[listIndex].items[itemIndex].context!.size!.width,
           child: prov.board.lists[listIndex].items[itemIndex].child,
         ),
         listIndex: listIndex,
@@ -501,8 +468,7 @@ class ListItemProvider extends ChangeNotifier {
     setsate();
   }
 
-  bool isCurrentElementDragged(
-      {required int listIndex, required int itemIndex}) {
+  bool isCurrentElementDragged({required int listIndex, required int itemIndex}) {
     var prov = ref.read(ProviderList.boardProvider);
     final draggableProv = ref.read(ProviderList.draggableNotifier);
 
@@ -514,8 +480,7 @@ class ListItemProvider extends ChangeNotifier {
   void saveNewCard() {
     var boardProv = ref.read(ProviderList.boardProvider);
     final cardState = boardProv.newCardState;
-    boardProv.board.lists[cardState.listIndex!].items[cardState.cardIndex!]
-        .child = Container(
+    boardProv.board.lists[cardState.listIndex!].items[cardState.cardIndex!].child = Container(
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey.shade200),
         borderRadius: BorderRadius.circular(4),
@@ -523,51 +488,57 @@ class ListItemProvider extends ChangeNotifier {
       ),
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
-      child: Text(boardProv.newCardState.textController.text,
-          style: boardProv.board.textStyle),
+      child: Text(boardProv.newCardState.textController.text, style: boardProv.board.textStyle),
     );
-    boardProv.board.lists[cardState.listIndex!].items[cardState.cardIndex!]
-            .prevChild =
-        boardProv.board.lists[cardState.listIndex!].items[cardState.cardIndex!]
-            .child;
+    boardProv.board.lists[cardState.listIndex!].items[cardState.cardIndex!].prevChild =
+        boardProv.board.lists[cardState.listIndex!].items[cardState.cardIndex!].child;
     cardState.isFocused = false;
-    boardProv.board.lists[cardState.listIndex!].items[cardState.listIndex!]
-        .isNew = false;
+    boardProv.board.lists[cardState.listIndex!].items[cardState.listIndex!].isNew = false;
     boardProv.newCardState.textController.clear();
-    boardProv.board.lists[cardState.listIndex!].items[cardState.listIndex!]
-        .setState!();
+    boardProv.board.lists[cardState.listIndex!].items[cardState.listIndex!].setState!();
     cardState.cardIndex = null;
     cardState.listIndex = null;
-    log("TAPPED");
   }
 
-  void reorderCard() {
+  Future<void> reorderCard(BuildContext context) async {
     var boardProv = ref.read(ProviderList.boardProvider);
-    BoardList list =
-        boardProv.board.lists[boardProv.board.dragItemOfListIndex!];
+    BoardList list = boardProv.board.lists[boardProv.board.dragItemOfListIndex!];
     ListItem card = list.items[boardProv.board.dragItemIndex!];
     card.child = card.prevChild;
 
-    if (boardProv.draggedItemState!.listIndex ==
-        boardProv.board.dragItemOfListIndex!) {
+    if (boardProv.draggedItemState!.listIndex == boardProv.board.dragItemOfListIndex!) {
       list.items.insert(
           boardProv.board.dragItemIndex!,
           boardProv.board.lists[boardProv.draggedItemState!.listIndex!].items
               .removeAt(boardProv.draggedItemState!.itemIndex!));
     } else {
-      if (card.placeHolderAt == PlaceHolderAt.bottom) {
-        list.items.insert(
-            boardProv.board.dragItemIndex! + 1,
-            boardProv.board.lists[boardProv.draggedItemState!.listIndex!].items
-                .removeAt(boardProv.draggedItemState!.itemIndex!));
-      } else {
-        list.items.insert(
-            boardProv.board.dragItemIndex!,
-            boardProv.board.lists[boardProv.draggedItemState!.listIndex!].items
-                .removeAt(boardProv.draggedItemState!.itemIndex!));
+      final object = boardProv.board.lists[boardProv.draggedItemState!.listIndex!]
+          .items[boardProv.draggedItemState!.itemIndex!].object;
+
+      final resultConfirm = await boardProv.board.confirmChangeStatus(
+        context,
+        boardProv.board.lists[boardProv.draggedItemState!.listIndex!].statusReservation,
+        list.statusReservation,
+        object,
+      );
+      if (resultConfirm ?? false) {
+        final res = await boardProv.board.changeStatus(object, list.statusReservation);
+        if (res == true) {
+          final model = boardProv.board.changeModel(object, list.statusReservation);
+          ListItem listItem = boardProv.board.lists[boardProv.draggedItemState!.listIndex!].items
+              .removeAt(boardProv.draggedItemState!.itemIndex!);
+          listItem.object = model;
+
+          if (card.placeHolderAt == PlaceHolderAt.bottom) {
+            list.items.insert(boardProv.board.dragItemIndex! + 1, listItem);
+          } else {
+            list.items.insert(boardProv.board.dragItemIndex!, listItem);
+          }
+          boardProv.board.setstate?.call();
+        }
       }
     }
-
     card.placeHolderAt = PlaceHolderAt.none;
+    boardProv.board.setstate?.call();
   }
 }

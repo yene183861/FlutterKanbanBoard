@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kanban_board/Provider/provider_list.dart';
 import 'package:kanban_board/draggable/draggable_state.dart';
+import 'package:kanban_board/provider/provider_list.dart';
 
 class DraggedCard extends ConsumerStatefulWidget {
   const DraggedCard({super.key});

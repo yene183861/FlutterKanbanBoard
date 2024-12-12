@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../Provider/provider_list.dart';
+import 'package:kanban_board/provider/provider_list.dart';
 
 class Item extends ConsumerStatefulWidget {
   const Item({
@@ -106,16 +106,15 @@ class _ItemState extends ConsumerState<Item> {
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey.shade200),
                       borderRadius: BorderRadius.circular(4),
-                      color: prov.board.lists[widget.listIndex]
-                              .items[widget.itemIndex].backgroundColor ??
+                      color: prov.board.lists[widget.listIndex].items[widget.itemIndex]
+                              .backgroundColor ??
                           Colors.white,
                     ),
                     width: prov.draggedItemState!.width,
                     height: prov.draggedItemState!.height,
                   )
                 : cardProv.isCurrentElementDragged(
-                        listIndex: widget.listIndex,
-                        itemIndex: widget.itemIndex)
+                        listIndex: widget.listIndex, itemIndex: widget.itemIndex)
                     ? Container()
                     : GestureDetector(
                         onTap: () {
@@ -125,10 +124,8 @@ class _ItemState extends ConsumerState<Item> {
                         },
                         child: Container(
                           margin: const EdgeInsets.only(bottom: 5),
-                          width: prov.board.lists[widget.listIndex]
-                              .items[widget.itemIndex].width,
-                          child: prov.board.lists[widget.listIndex]
-                              .items[widget.itemIndex].child,
+                          width: prov.board.lists[widget.listIndex].items[widget.itemIndex].width,
+                          child: prov.board.lists[widget.listIndex].items[widget.itemIndex].child,
                         ),
                       )));
   }

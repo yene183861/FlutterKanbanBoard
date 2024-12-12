@@ -1,15 +1,13 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kanban_board/Provider/provider_list.dart';
 import 'package:kanban_board/draggable/card_draggable.dart';
 import 'package:kanban_board/draggable/draggable_state.dart';
 import 'package:kanban_board/draggable/list_draggable.dart';
-import '../models/inputs.dart';
-import '../models/board.dart';
-import '../models/board_list.dart';
-import '../models/item_state.dart';
+import 'package:kanban_board/models/board.dart';
+import 'package:kanban_board/models/board_list.dart';
+import 'package:kanban_board/models/inputs.dart';
+import 'package:kanban_board/models/item_state.dart';
+import 'package:kanban_board/provider/provider_list.dart';
 
 class BoardProvider extends ChangeNotifier {
   BoardProvider(ChangeNotifierProviderRef<BoardProvider> this.ref);
@@ -27,63 +25,66 @@ class BoardProvider extends ChangeNotifier {
   var scrollingRight = false;
   var scrollingLeft = false;
 
-  void initializeBoard(
-      {required List<BoardListsData> data,
-      Color backgroundColor = Colors.white,
-      TextStyle? textStyle,
-      Function(int? itemIndex, int? listIndex)? onItemTap,
-      Function(int? itemIndex, int? listIndex)? onItemLongPress,
-      Function(int? listIndex)? onListTap,
-      Function(int? listIndex)? onListLongPress,
-      double? displacementX,
-      double? displacementY,
-      void Function(int? oldCardIndex, int? newCardIndex, int? oldListIndex,
-              int? newListIndex)?
-          onItemReorder,
-      void Function(int? oldListIndex, int? newListIndex)? onListReorder,
-      void Function(String? oldName, String? newName)? onListRename,
-      void Function(String? cardIndex, String? listIndex, String? text)?
-          onNewCardInsert,
-      Decoration? boardDecoration,
-      Decoration? listDecoration,
-      Widget Function(Widget child, Animation<double> animation)?
-          listTransitionBuilder,
-      Widget Function(Widget child, Animation<double> animation)?
-          cardTransitionBuilder,
-      required Duration cardTransitionDuration,
-      required Duration listTransitionDuration,
-      Color? cardPlaceHolderColor,
-      Color? listPlaceHolderColor,
-      ScrollConfig? boardScrollConfig,
-      ScrollConfig? listScrollConfig}) {
+  void initializeBoard({
+    required List<BoardListsData> data,
+    Color backgroundColor = Colors.white,
+    TextStyle? textStyle,
+    Function(int? itemIndex, int? listIndex)? onItemTap,
+    Function(int? itemIndex, int? listIndex)? onItemLongPress,
+    Function(int? listIndex)? onListTap,
+    Function(int? listIndex)? onListLongPress,
+    double? displacementX,
+    double? displacementY,
+    void Function(int? oldCardIndex, int? newCardIndex, int? oldListIndex, int? newListIndex)?
+        onItemReorder,
+    void Function(int? oldListIndex, int? newListIndex)? onListReorder,
+    void Function(String? oldName, String? newName)? onListRename,
+    void Function(String? cardIndex, String? listIndex, String? text)? onNewCardInsert,
+    Decoration? boardDecoration,
+    Decoration? listDecoration,
+    Widget Function(Widget child, Animation<double> animation)? listTransitionBuilder,
+    Widget Function(Widget child, Animation<double> animation)? cardTransitionBuilder,
+    required Duration cardTransitionDuration,
+    required Duration listTransitionDuration,
+    Color? cardPlaceHolderColor,
+    Color? listPlaceHolderColor,
+    ScrollConfig? boardScrollConfig,
+    ScrollConfig? listScrollConfig,
+    required Future<bool?> Function(BuildContext context, int inStatus, int srcStatus, Object model)
+        confirmChangeStatus,
+    required Future<bool> Function(Object model, int status) changeStatus,
+    required Object Function(Object model, int status) changeModel,
+  }) {
     board = BoardState(
-        textStyle: textStyle,
-        lists: [],
-        displacementX: displacementX,
-        displacementY: displacementY,
-        onItemTap: onItemTap,
-        onItemLongPress: onItemLongPress,
-        onListTap: onListTap,
-        onListLongPress: onListLongPress,
-        onItemReorder: onItemReorder,
-        onListReorder: onListReorder,
-        onListRename: onListRename,
-        onNewCardInsert: onNewCardInsert,
-        boardScrollConfig: boardScrollConfig,
-        listScrollConfig: listScrollConfig,
-        transitionHandler: TransitionHandler(
-            cardTransitionBuilder:
-                cardTransitionBuilder ?? (child, animation) => child,
-            listTransitionBuilder:
-                listTransitionBuilder ?? (child, animation) => child,
-            cardTransitionDuration: cardTransitionDuration,
-            listTransitionDuration: listTransitionDuration),
-        controller: ScrollController(),
-        backgroundColor: backgroundColor,
-        cardPlaceholderColor: cardPlaceHolderColor,
-        listPlaceholderColor: listPlaceHolderColor,
-        listDecoration: listDecoration,
-        boardDecoration: boardDecoration);
+      textStyle: textStyle,
+      lists: [],
+      displacementX: displacementX,
+      displacementY: displacementY,
+      onItemTap: onItemTap,
+      onItemLongPress: onItemLongPress,
+      onListTap: onListTap,
+      onListLongPress: onListLongPress,
+      onItemReorder: onItemReorder,
+      onListReorder: onListReorder,
+      onListRename: onListRename,
+      onNewCardInsert: onNewCardInsert,
+      boardScrollConfig: boardScrollConfig,
+      listScrollConfig: listScrollConfig,
+      transitionHandler: TransitionHandler(
+          cardTransitionBuilder: cardTransitionBuilder ?? (child, animation) => child,
+          listTransitionBuilder: listTransitionBuilder ?? (child, animation) => child,
+          cardTransitionDuration: cardTransitionDuration,
+          listTransitionDuration: listTransitionDuration),
+      controller: ScrollController(),
+      backgroundColor: backgroundColor,
+      cardPlaceholderColor: cardPlaceHolderColor,
+      listPlaceholderColor: listPlaceHolderColor,
+      listDecoration: listDecoration,
+      boardDecoration: boardDecoration,
+      confirmChangeStatus: confirmChangeStatus,
+      changeStatus: changeStatus,
+      changeModel: changeModel,
+    );
 
     for (int i = 0; i < data.length; i++) {
       List<ListItem> listItems = [];
@@ -92,18 +93,21 @@ class BoardProvider extends ChangeNotifier {
             child: data[i].items[j],
             listIndex: i,
             index: j,
-            prevChild: data[i].items[j]));
+            prevChild: data[i].items[j],
+            object: data[i].objects[j]));
       }
       board.lists.add(BoardList(
-          header: data[i].header,
-          footer: data[i].footer,
-          headerBackgroundColor: data[i].headerBackgroundColor,
-          footerBackgroundColor: data[i].footerBackgroundColor,
-          backgroundColor: data[i].backgroundColor,
-          items: listItems,
-          width: data[i].width,
-          scrollController: ScrollController(),
-          title: data[i].title ?? 'LIST ${i + 1}'));
+        header: data[i].header,
+        footer: data[i].footer,
+        headerBackgroundColor: data[i].headerBackgroundColor,
+        footerBackgroundColor: data[i].footerBackgroundColor,
+        backgroundColor: data[i].backgroundColor,
+        items: listItems,
+        width: data[i].width,
+        scrollController: ScrollController(),
+        title: data[i].title ?? 'LIST ${i + 1}',
+        statusReservation: data[i].typeStatus,
+      ));
     }
   }
 
@@ -129,14 +133,11 @@ class BoardProvider extends ChangeNotifier {
       scrolling = true;
       scrollingRight = true;
       if (board.boardScrollConfig == null) {
-        log("HEREEEE");
         await board.controller.animateTo(board.controller.offset + 100,
             duration: const Duration(milliseconds: 100), curve: Curves.linear);
       } else {
-        await board.controller.animateTo(
-            board.boardScrollConfig!.offset + board.controller.offset,
-            duration: board.boardScrollConfig!.duration,
-            curve: board.boardScrollConfig!.curve);
+        await board.controller.animateTo(board.boardScrollConfig!.offset + board.controller.offset,
+            duration: board.boardScrollConfig!.duration, curve: board.boardScrollConfig!.curve);
       }
       scrolling = false;
       scrollingRight = false;
@@ -147,14 +148,11 @@ class BoardProvider extends ChangeNotifier {
 
       if (board.boardScrollConfig == null) {
         await board.controller.animateTo(board.controller.offset - 100,
-            duration:
-                Duration(milliseconds: valueNotifier.value.dx < 20 ? 50 : 100),
+            duration: Duration(milliseconds: valueNotifier.value.dx < 20 ? 50 : 100),
             curve: Curves.linear);
       } else {
-        await board.controller.animateTo(
-            board.controller.offset - board.boardScrollConfig!.offset,
-            duration: board.boardScrollConfig!.duration,
-            curve: board.boardScrollConfig!.curve);
+        await board.controller.animateTo(board.controller.offset - board.boardScrollConfig!.offset,
+            duration: board.boardScrollConfig!.duration, curve: board.boardScrollConfig!.curve);
       }
 
       scrolling = false;

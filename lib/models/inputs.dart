@@ -9,6 +9,8 @@ class BoardListsData {
   final List<Widget> items;
   Color? backgroundColor;
   double width;
+  List<Object> objects;
+  int typeStatus;
   BoardListsData({
     this.title,
     this.header,
@@ -23,6 +25,8 @@ class BoardListsData {
       252,
     ),
     this.width = 300,
+    required this.objects,
+    required this.typeStatus,
   }) {
     footer = footer ??
         Container(
@@ -42,10 +46,7 @@ class BoardListsData {
               ),
               Text(
                 'NEW',
-                style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 19,
-                    fontWeight: FontWeight.bold),
+                style: TextStyle(color: Colors.black, fontSize: 19, fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -61,10 +62,8 @@ class BoardListsData {
             children: [
               Text(
                 title ?? '',
-                style: const TextStyle(
-                    fontSize: 20,
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
               ),
               GestureDetector(
                 child: const SizedBox(

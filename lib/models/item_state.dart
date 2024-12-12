@@ -18,6 +18,7 @@ class ListItem {
   bool? addedBySystem = false;
   Size? actualSize;
   Widget prevChild;
+  Object object;
   ListItem({
     this.context,
     required this.child,
@@ -34,6 +35,7 @@ class ListItem {
     this.x,
     this.y,
     this.isNew = false,
+    required this.object,
   });
 }
 

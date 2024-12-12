@@ -22,12 +22,11 @@ class BoardState {
   Function(int? itemIndex, int? listIndex)? onItemLongPress;
   Function(int? listIndex)? onListTap;
   Function(int? listIndex)? onListLongPress;
-  final void Function(int? oldCardIndex, int? newCardIndex, int? oldListIndex,
-      int? newListIndex)? onItemReorder;
+  final void Function(int? oldCardIndex, int? newCardIndex, int? oldListIndex, int? newListIndex)?
+      onItemReorder;
   final void Function(int? oldListIndex, int? newListIndex)? onListReorder;
   final void Function(String? oldName, String? newName)? onListRename;
-  final void Function(String? cardIndex, String? listIndex, String? text)?
-      onNewCardInsert;
+  final void Function(String? cardIndex, String? listIndex, String? text)? onNewCardInsert;
   Color? backgroundColor;
   Color? cardPlaceholderColor;
   Color? listPlaceholderColor;
@@ -37,6 +36,10 @@ class BoardState {
   Decoration? listDecoration;
   Decoration? boardDecoration;
   TransitionHandler transitionHandler;
+  Future<bool?> Function(BuildContext context, int inStatus, int srcStatus, Object model)
+      confirmChangeStatus;
+  Future<bool> Function(Object model, int status) changeStatus;
+  Object Function(Object model, int status) changeModel;
 
   BoardState({
     required this.lists,
@@ -64,20 +67,18 @@ class BoardState {
     this.boardDecoration,
     this.dragItemOfListIndex,
     required this.transitionHandler,
+    required this.confirmChangeStatus,
+    required this.changeStatus,
+    required this.changeModel,
   }) {
     textStyle = textStyle ??
-        TextStyle(
-            color: Colors.grey.shade800,
-            fontSize: 19,
-            fontWeight: FontWeight.w400);
+        TextStyle(color: Colors.grey.shade800, fontSize: 19, fontWeight: FontWeight.w400);
   }
 }
 
 class TransitionHandler {
-  final Widget Function(Widget child, Animation<double> animation)
-      cardTransitionBuilder;
-  final Widget Function(Widget child, Animation<double> animation)
-      listTransitionBuilder;
+  final Widget Function(Widget child, Animation<double> animation) cardTransitionBuilder;
+  final Widget Function(Widget child, Animation<double> animation) listTransitionBuilder;
   final Duration cardTransitionDuration;
   final Duration listTransitionDuration;
 
